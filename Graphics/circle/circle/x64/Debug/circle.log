@@ -1,0 +1,5 @@
+﻿  circle.cpp
+D:\Coding Stuff\Graphics\circle\circle\circle.cpp(72,12): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+D:\Coding Stuff\Graphics\circle\circle\circle.cpp(90,12): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+D:\Coding Stuff\Graphics\circle\circle\circle.cpp(91,12): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  circle.vcxproj -> D:\Coding Stuff\Graphics\circle\x64\Debug\circle.exe

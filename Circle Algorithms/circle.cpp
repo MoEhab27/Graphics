@@ -1,10 +1,18 @@
 /*****************************************************************************
+ * File: circle.cpp
+ * Author: Mohamed Ehab
+ * Last Modified: 28/3/2024
+ * Description: This file contains implementations of various algorithms to draw circles.
+******************************************************************************/
+
+
+/*****************************************************************************
 *								Headers
 ******************************************************************************/
 #include <Windows.h>
 #include <math.h>
 /*****************************************************************************
-*							Function Definitions
+*							Function Prototypes
 ******************************************************************************/
 /*
  * Description: The first algorithm to draw circle, using the second octet where the |slope| <= 1
@@ -19,7 +27,7 @@ void drawCircle1(HDC hdc, int xc, int yc, int r, COLORREF color);
  */
 void drawCircle2(HDC hdc, int xc, int yc, int r, COLORREF color);
 /*
- * Description: The third algorithm and the best of the three to draw the circle using the same concept in
+ * Description: The third algorithm to draw the circle using the same concept in
  *				the polar algorithm but this one is Iterative Polar, by calculating the difference between the points
  *				and add them to the point we have each iteration to get the new point, then draw the 8 points calculated
  *				from the new point we've got.
@@ -32,8 +40,18 @@ void drawCircle3(HDC hdc, int xc, int yc, int r, COLORREF color);
  *				whole circle.
  */
 void draw8points(HDC hdc, int xc, int yc, int x, int y, COLORREF color);
-
-
+/*
+ * Description: Bresenham's algorithm to get rid of the floating point number for more optimization and
+ *				faster execution by calculating the midpoint and the change and draw the point based on the
+ *				midpoint position then adding the change.
+ */
+void drawCircleBresenham1(HDC hdc, int xc, int yc, int r, COLORREF color);
+/*
+ * Description: The second Bresenham's algorithm and the fastest of all, works by calculating the second order change
+ *				(the change of the change) which makes the algorithm have no floating point numbers or multiplications or divisions
+ *				inside the loop, only integer addition and subtraction.
+*/
+void drawCircleBresenham2(HDC hdc, int xc, int yc, int r, COLORREF color);
 
 LRESULT WINAPI WndProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 {
@@ -45,7 +63,8 @@ LRESULT WINAPI WndProc(HWND hwnd, UINT m, WPARAM wp, LPARAM lp)
 		hdc = GetDC(hwnd);
 		x = LOWORD(lp);
 		y = HIWORD(lp);
-		drawCircle2(hdc, x, y, 100, RGB(77, 100, 99));
+		drawCircleBresenham2(hdc, x, y, 100, RGB(77, 100, 99));
+
 		ReleaseDC(hwnd, hdc);
 		break;
 	case WM_CLOSE:
@@ -140,6 +159,63 @@ void drawCircle3(HDC hdc, int xc, int yc, int r, COLORREF color)
 		draw8points(hdc, xc, yc, round(x), round(y), color);
 	}
 }
+
+/*
+ * Description: Bresenham's algorithm to get rid of the floating point number for more optimization and 
+ *				faster execution by calculating the midpoint and the change and draw the point based on the
+ *				midpoint position then adding the change. 
+*/
+void drawCircleBresenham1(HDC hdc, int xc, int yc, int r, COLORREF color) 
+{
+	int x = 0, y = r;
+	draw8points(hdc, xc, yc, x, y, color);
+	int d = 1 - r;
+	while (x < y) 
+	{
+		if (d >= 0) 
+		{
+			d += (2 * (x - y)) + 5;
+			y--;
+		}
+		else 
+		{
+			d += (2 * x) + 3;
+		}
+		x++;
+		draw8points(hdc, xc, yc, x, y, color);
+	}
+}
+
+/*
+ * Description: The second Bresenham's algorithm and the fastest of all, works by calculating the second order change
+ *				(the change of the change) which makes the algorithm have no floating point numbers or multiplications or divisions
+ *				inside the loop, only integer addition and subtraction.
+*/
+void drawCircleBresenham2(HDC hdc, int xc, int yc, int r, COLORREF color) 
+{
+	int x = 0, y = r;
+	draw8points(hdc, xc, yc, x, y, color);
+	int d = 1 - r;
+	int changeOne = 3, changeTwo = 5 - (2 * r);
+	while (x < y)
+	{
+		if (d < 0)
+		{
+			d += changeOne;
+			changeTwo += 2;
+		}
+		else 
+		{
+			d += changeTwo;
+			changeTwo += 4;
+			y--;
+		}
+		changeOne += 2;
+		x++;
+		draw8points(hdc, xc, yc, x, y, color);
+	}
+}
+
 
 /* 
  * Description: When this function is give one point on the circle it can calculate 

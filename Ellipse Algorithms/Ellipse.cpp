@@ -136,3 +136,4 @@ void draw4points(HDC hdc, int xc, int yc, int x, int y, COLORREF color)
 	SetPixel(hdc, xc + x, yc - y, color);
 }
 
+//DONE
